@@ -169,7 +169,32 @@ ORDER BY total_claims DESC;
 "MIRTAZAPINE"	3085	"not opioid"
 "FUROSEMIDE"	3083	"not opioid"
 
----Question
+---Question6c
+SELECT drug_name, SUM(total_claim_count) AS total_claims, nppes_provider_first_name AS first_name, nppes_provider_last_org_name AS last_name,
+CASE
+    WHEN opioid_drug_flag = 'Y' THEN 'opioid'
+    ELSE 'not opioid'
+    END AS drug_type
+FROM prescription
+LEFT JOIN drug
+USING(drug_name)
+LEFT JOIN prescriber
+USING (npi)
+WHERE total_claim_count > 3000
+GROUP BY drug_name, drug_type, first_name, last_name
+ORDER BY total_claims DESC;
+---ANSWER
+"OXYCODONE HCL"	4538	"DAVID"	"COFFEY"	"opioid"
+"LISINOPRIL"	3655	"BRUCE"	"PENDLEY"	"not opioid"
+"GABAPENTIN"	3531	"BRUCE"	"PENDLEY"	"not opioid"
+"HYDROCODONE-ACETAMINOPHEN"	3376	"DAVID"	"COFFEY"	"opioid"
+"LEVOTHYROXINE SODIUM"	3138	"DEAVER"	"SHATTUCK"	"not opioid"
+"LEVOTHYROXINE SODIUM"	3101	"ERIC"	"HASEMEIER"	"not opioid"
+"MIRTAZAPINE"	3085	"BRUCE"	"PENDLEY"	"not opioid"
+"FUROSEMIDE"	3083	"MICHAEL"	"COX"	"not opioid"
+"LEVOTHYROXINE SODIUM"	3023	"BRUCE"	"PENDLEY"	"not opioid"
+
+
 
 ---CHECK FOR 3a
 SELECT generic_name
