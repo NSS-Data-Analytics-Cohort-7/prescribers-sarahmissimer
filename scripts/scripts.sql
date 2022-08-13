@@ -139,7 +139,37 @@ FROM prescription
 WHERE total_claim_count > 3000
 GROUP BY drug_name
 ORDER BY total_claims DESC;
+---ANSWER:
+"LEVOTHYROXINE SODIUM"	9262
+"OXYCODONE HCL"	4538
+"LISINOPRIL"	3655
+"GABAPENTIN"	3531
+"HYDROCODONE-ACETAMINOPHEN"	3376
+"MIRTAZAPINE"	3085
+"FUROSEMIDE"	3083
 
+---Question6b
+SELECT drug_name, SUM(total_claim_count) AS total_claims, 
+CASE
+    WHEN opioid_drug_flag = 'Y' THEN 'opioid'
+    ELSE 'not opioid'
+    END AS drug_type
+FROM prescription
+LEFT JOIN drug
+USING(drug_name) 
+WHERE total_claim_count > 3000
+GROUP BY drug_name, drug_type
+ORDER BY total_claims DESC;
+----ANSWER
+"LEVOTHYROXINE SODIUM"	9262	"not opioid"
+"OXYCODONE HCL"	4538	"opioid"
+"LISINOPRIL"	3655	"not opioid"
+"GABAPENTIN"	3531	"not opioid"
+"HYDROCODONE-ACETAMINOPHEN"	3376	"opioid"
+"MIRTAZAPINE"	3085	"not opioid"
+"FUROSEMIDE"	3083	"not opioid"
+
+---Question
 
 ---CHECK FOR 3a
 SELECT generic_name
