@@ -44,6 +44,12 @@ ORDER BY opioid_claim DESC;
 --- ANSWER: Nurse Practitioner, 9551
 
 ---Question2c
+SELECT p1.specialty_description,SUM(p2.total_claim_count)
+FROM prescriber AS p1
+LEFT JOIN prescription AS p2
+USING (npi)
+GROUP BY p1.specialty_description
+HAVING SUM(p2.total_claim_count) IS NULL;
 
 ---Question2d
 
@@ -196,7 +202,7 @@ ORDER BY total_claims DESC;
 "FUROSEMIDE"	3083	"not opioid"
 "LEVOTHYROXINE SODIUM"	3023	"not opioid"
 
----Question6c
+---Question6c-- don't need to use the case when
 SELECT drug_name, SUM(total_claim_count) AS total_claims, nppes_provider_first_name AS first_name, nppes_provider_last_org_name AS last_name,
 CASE
     WHEN opioid_drug_flag = 'Y' THEN 'opioid'
@@ -207,7 +213,7 @@ LEFT JOIN drug
 USING(drug_name)
 LEFT JOIN prescriber
 USING (npi)
-WHERE total_claim_count > 3000
+WHERE total_claim_count >= 3000
 GROUP BY drug_name, drug_type, first_name, last_name
 ORDER BY total_claims DESC;
 ---ANSWER
@@ -222,7 +228,35 @@ ORDER BY total_claims DESC;
 "LEVOTHYROXINE SODIUM"	3023	"BRUCE"	"PENDLEY"	"not opioid"
 
 ---Question7a
+SELECT npi, drug_name
+FROM prescriber
+CROSS JOIN drug AS d
+WHERE specialty_description = 'Pain Management'
+AND nppes_provider_city = 'NASHVILLE'
+AND d.opioid_drug_flag = 'Y'
+GROUP BY npi, drug_name;
 
+--Question7b --looking for multiple keys on this one. 
+SELECT prescriber.npi, drug_name, total_claim_count
+FROM prescriber
+CROSS JOIN drug 
+LEFT JOIN prescription
+USING (npi, drug_name)
+WHERE specialty_description = 'Pain Management'
+AND nppes_provider_city = 'NASHVILLE'
+AND opioid_drug_flag = 'Y'
+GROUP BY prescriber.npi, drug_name, total_claim_count;
+
+---Question7c
+SELECT prescriber.npi, drug_name, COALESCE(total_claim_count, 0)
+FROM prescriber
+CROSS JOIN drug 
+LEFT JOIN prescription
+USING (npi, drug_name)
+WHERE specialty_description = 'Pain Management'
+    AND nppes_provider_city = 'NASHVILLE'
+    AND opioid_drug_flag = 'Y'
+ORDER BY drug_name;
 
 ---CHECK FOR 3a
 SELECT generic_name
